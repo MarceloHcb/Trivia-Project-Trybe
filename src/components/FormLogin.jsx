@@ -25,7 +25,7 @@ export default class FormLogin extends Component {
     const token = await response.json();
     localStorage.setItem('token', token.token);
     history.push('/gamepage');
-    }
+  };
 
   render() {
     return (
