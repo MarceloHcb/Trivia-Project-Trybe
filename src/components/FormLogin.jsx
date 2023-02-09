@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types';
 import React, { Component } from 'react';
 
 export default class FormLogin extends Component {
@@ -17,6 +18,14 @@ export default class FormLogin extends Component {
     this.setState({
       [name]: value,
     });
+  };
+
+  handleClick = async () => {
+    const { history } = this.props;
+    const response = await fetch('https://opentdb.com/api_token.php?command=request');
+    const token = await response.json();
+    localStorage.setItem('token', token.token);
+    history.push('/gamepage');
   };
 
   render() {
@@ -48,6 +57,7 @@ export default class FormLogin extends Component {
           disabled={ this.validation() }
           type="button"
           data-testid="btn-play"
+          onClick={ this.handleClick }
         >
           Play
 
@@ -56,3 +66,9 @@ export default class FormLogin extends Component {
     );
   }
 }
+
+FormLogin.propTypes = {
+  history: PropTypes.shape({
+    push: PropTypes.func,
+  }).isRequired,
+};
