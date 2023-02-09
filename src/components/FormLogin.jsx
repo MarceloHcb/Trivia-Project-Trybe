@@ -28,6 +28,11 @@ export default class FormLogin extends Component {
     history.push('/gamepage');
   };
 
+  handleSettings = () => {
+    const { history } = this.props;
+    history.push('/settings');
+  };
+
   render() {
     return (
       <div>
@@ -60,6 +65,14 @@ export default class FormLogin extends Component {
           onClick={ this.handleClick }
         >
           Play
+
+        </button>
+        <button
+          type="button"
+          data-testid="btn-settings"
+          onClick={ this.handleSettings }
+        >
+          Settings
 
         </button>
       </div>
