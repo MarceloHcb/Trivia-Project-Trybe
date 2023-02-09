@@ -19,6 +19,14 @@ export default class FormLogin extends Component {
     });
   };
 
+  handleClick = async () => {
+    const { history } = this.props;
+    const response = await fetch('https://opentdb.com/api_token.php?command=request');
+    const token = await response.json();
+    localStorage.setItem('token', token.token);
+    history.push('/gamepage');
+    }
+
   render() {
     return (
       <div>
@@ -48,6 +56,7 @@ export default class FormLogin extends Component {
           disabled={ this.validation() }
           type="button"
           data-testid="btn-play"
+          onClick={ this.handleClick }
         >
           Play
 
