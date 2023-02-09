@@ -5,7 +5,7 @@ export default class Login extends Component {
   render() {
     return (
       <div>
-        <FormLogin />
+        <FormLogin { ...this.props } />
       </div>
     );
   }
