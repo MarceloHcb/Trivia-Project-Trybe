@@ -12,7 +12,8 @@ const player = (state = INITIAL_STATE, action) => {
   case ADD_USER:
     return {
       ...state,
-      gravatarEmail: action.payload,
+      gravatarEmail: action.payload.gravatarEmail,
+      name: action.payload.name,
     };
   default:
     return state;

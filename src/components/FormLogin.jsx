@@ -24,11 +24,11 @@ class FormLogin extends Component {
 
   handleClick = async () => {
     const { history, dispatch } = this.props;
-    const { email } = this.state;
+    const { email, name } = this.state;
     const response = await fetch('https://opentdb.com/api_token.php?command=request');
     const token = await response.json();
     localStorage.setItem('token', token.token);
-    dispatch(addUser(email));
+    dispatch(addUser(email, name));
     history.push('/gamepage');
   };
 
