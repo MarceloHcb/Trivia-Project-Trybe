@@ -4,7 +4,7 @@ import React, { Component } from 'react';
 class GamePage extends Component {
   state = {
     results: [],
-    // answers: [],
+    answers: [],
     isLoading: true,
   };
 
@@ -12,35 +12,47 @@ class GamePage extends Component {
     this.requestQuestions();
   }
 
-  // randomAnswers = () => {
-  //   const { results } = this.state;
-  //   const teste = (results[0].incorrect_answers.map((inc) => inc));
-  //   const answers = [...results[0].correct_answer, teste];
-  //   this.setState({
-  //     answers,
-  //   });
-  // };
-
   requestQuestions = async () => {
+    const magicNumber = 0.5;
     const token = localStorage.getItem('token');
     const { history } = this.props;
     const response = await fetch(`https://opentdb.com/api.php?amount=5&token=${token}`);
     const data = await response.json();
-    if (data.results.length > 0) {
-      this.setState({
-        results: data.results,
-        isLoading: false,
-      });
-      this.randomAnswers();
-    } else {
+    if (data.results.length === 0) {
       localStorage.removeItem('token');
       history.push('/');
     }
+    const answers = (
+      <button
+        data-testid="correct-answer"
+        type="button"
+        key="5"
+      >
+        {data.results[0].correct_answer}
+
+      </button>);
+    const incAnswers = (
+      data.results[0].incorrect_answers.map((inc, index) => (
+        <button
+          data-testid={ `wrong-answer-${index}` }
+          type="button"
+          key={ index }
+        >
+          {inc}
+
+        </button>
+      ))
+    );
+
+    this.setState({
+      results: data.results,
+      answers: [...incAnswers, answers].sort(() => Math.random() - magicNumber),
+      isLoading: false,
+    });
   };
 
   render() {
-    const { results, isLoading } = this.state;
-    // const RandomNumber = Math.floor(Math.random() * 5);
+    const { results, isLoading, answers } = this.state;
     return (
       <div>
         {isLoading === true ? <p>Loading...</p> : (
@@ -52,23 +64,8 @@ class GamePage extends Component {
               {results[0].question}
             </h2>
             <div data-testid="answer-options">
-              <button
-                data-testid="correct-answer"
-                type="button"
-              >
-                {results[0].correct_answer}
+              {answers}
 
-              </button>
-              {results[0].incorrect_answers.map((inc, index) => (
-                <button
-                  data-testid={ `wrong-answer-${index}` }
-                  key={ index }
-                  type="button"
-                >
-                  {inc}
-
-                </button>
-              ))}
             </div>
           </div>
         )}
@@ -79,7 +76,7 @@ class GamePage extends Component {
 
 GamePage.propTypes = {
   history: PropTypes.shape({
-    push: PropTypes.func,
+    push: PropTypes.func.isRequired,
   }).isRequired,
 };
 
