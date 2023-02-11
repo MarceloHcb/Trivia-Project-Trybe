@@ -12,16 +12,8 @@ class GamePage extends Component {
     this.requestQuestions();
   }
 
-  requestQuestions = async () => {
+  createButtons = (data) => {
     const magicNumber = 0.5;
-    const token = localStorage.getItem('token');
-    const { history } = this.props;
-    const response = await fetch(`https://opentdb.com/api.php?amount=5&token=${token}`);
-    const data = await response.json();
-    if (data.results.length === 0) {
-      localStorage.removeItem('token');
-      history.push('/');
-    }
     const answers = (
       <button
         data-testid="correct-answer"
@@ -49,6 +41,19 @@ class GamePage extends Component {
       answers: [...incAnswers, answers].sort(() => Math.random() - magicNumber),
       isLoading: false,
     });
+  };
+
+  requestQuestions = async () => {
+    const token = localStorage.getItem('token');
+    const { history } = this.props;
+    const response = await fetch(`https://opentdb.com/api.php?amount=5&token=${token}`);
+    const data = await response.json();
+    if (data.response_code !== 0) {
+      localStorage.removeItem('token');
+      history.push('/');
+    } else {
+      this.createButtons(data);
+    }
   };
 
   render() {
