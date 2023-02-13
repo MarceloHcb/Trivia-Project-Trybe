@@ -13,6 +13,8 @@ class GamePage extends Component {
     borderRed: '',
     timer: 30,
     isDisabled: false,
+    questionNum: 0,
+    showNext: false,
   };
 
   componentDidMount() {
@@ -21,9 +23,10 @@ class GamePage extends Component {
   }
 
   requestQuestions = async () => {
+    const { history } = this.props;
+    const { questionNum } = this.state;
     const magicNumber = 0.5;
     const token = localStorage.getItem('token');
-    const { history } = this.props;
     const response = await fetch(`https://opentdb.com/api.php?amount=5&token=${token}`);
     const data = await response.json();
     console.log(data);
@@ -35,10 +38,11 @@ class GamePage extends Component {
       this.setState({
         results: data.results,
         isLoading: false,
-        correct: data.results[0].correct_answer,
+        correct: data.results[questionNum].correct_answer,
         // wrong: data.results[0].incorrect_answers.map((inc) => inc),
-        answers: [...data.results[0].incorrect_answers.map((inc) => inc),
-          data.results[0].correct_answer].sort(() => Math.random() - magicNumber),
+        answers: [...data.results[questionNum].incorrect_answers.map((inc) => inc),
+          data.results[questionNum].correct_answer]
+          .sort(() => Math.random() - magicNumber),
       });
     }
   };
@@ -50,6 +54,7 @@ class GamePage extends Component {
     const medium = 2;
     const hard = 3;
     const easy = 1;
+    clearInterval(this.timerInterval);
     switch (value) {
     case 'easy':
       value = easy;
@@ -70,6 +75,7 @@ class GamePage extends Component {
     this.setState({
       borderRed: '3px solid red',
       border: '3px solid rgb(6, 240, 15)',
+      showNext: true,
     });
     const fixedValue = 10;
     let totalScore = 0;
@@ -81,18 +87,24 @@ class GamePage extends Component {
     dispatch(updateScore(totalScore));
   };
 
+  handleNext = () => {
+    const { questionNum } = this.state;
+    this.setState({
+      questionNum: questionNum + 1,
+    });
+  };
+
   handleTimer = () => {
     const { timer } = this.state;
     const intervalTimer = 1000;
     let tim = timer;
-    const timerInterval = setInterval(() => {
+    this.timerInterval = setInterval(() => {
       tim -= 1;
       this.setState({
         timer: tim,
       });
-      console.log(tim);
       if (tim === 0) {
-        clearInterval(timerInterval);
+        clearInterval(this.timerInterval);
         this.setState({
           isDisabled: true,
         });
@@ -102,16 +114,16 @@ class GamePage extends Component {
 
   render() {
     const { results, isLoading, correct, border, borderRed,
-      answers, timer, isDisabled } = this.state;
+      answers, timer, isDisabled, questionNum, showNext } = this.state;
     return (
       <div>
         {isLoading === true ? <p>Loading...</p> : (
           <div>
             <h1 data-testid="question-category">
-              {results[0].category}
+              {results[questionNum].category}
             </h1>
             <h2 data-testid="question-text">
-              {results[0].question}
+              {results[questionNum].question}
             </h2>
             <h2>
               {' '}
@@ -125,7 +137,7 @@ class GamePage extends Component {
                   <button
                     key="8"
                     type="button"
-                    value={ results[0].difficulty }
+                    value={ results[questionNum].difficulty }
                     data-testid="correct-answer"
                     style={ { border } }
                     disabled={ isDisabled }
@@ -150,6 +162,18 @@ class GamePage extends Component {
                     </button>
                   )
               ))}
+              <div>
+                { showNext && (
+                  <button
+                    type="button"
+                    data-testid="btn-next"
+                    onClick={ this.handleNext }
+                  >
+                    next
+
+                  </button>
+                )}
+              </div>
             </div>
           </div>
         )}
