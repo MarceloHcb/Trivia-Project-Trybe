@@ -15,6 +15,8 @@ class GamePage extends Component {
     isDisabled: false,
     questionNum: 0,
     showNext: false,
+    totalScore: 0,
+    data: [],
   };
 
   componentDidMount() {
@@ -22,19 +24,37 @@ class GamePage extends Component {
     this.handleTimer();
   }
 
-  requestQuestions = async () => {
-    const { history } = this.props;
+  updateAnswers = (data) => {
     const { questionNum } = this.state;
+    console.log(data);
     const magicNumber = 0.5;
+    this.setState({
+      results: data.results,
+      isLoading: false,
+      correct: data.results[questionNum + 1].correct_answer,
+      // wrong: data.results[0].incorrect_answers.map((inc) => inc),
+      answers: [...data.results[questionNum + 1].incorrect_answers.map((inc) => inc),
+        data.results[questionNum + 1].correct_answer]
+        .sort(() => Math.random() - magicNumber),
+    });
+  };
+
+  requestQuestions = async () => {
+    const { questionNum } = this.state;
+    const { history } = this.props;
     const token = localStorage.getItem('token');
     const response = await fetch(`https://opentdb.com/api.php?amount=5&token=${token}`);
     const data = await response.json();
+    this.setState({
+      data,
+    });
     console.log(data);
 
     if (data.response_code !== 0) {
       localStorage.removeItem('token');
       history.push('/');
     } else {
+      const magicNumber = 0.5;
       this.setState({
         results: data.results,
         isLoading: false,
@@ -50,7 +70,9 @@ class GamePage extends Component {
   handleClick = ({ target }) => {
     let { value } = target;
     const { dispatch } = this.props;
-    const { timer } = this.state;
+    const { timer, data } = this.state;
+    let { totalScore } = this.state;
+    console.log(data);
     const medium = 2;
     const hard = 3;
     const easy = 1;
@@ -65,9 +87,6 @@ class GamePage extends Component {
     case 'hard':
       value = hard;
       break;
-    case 'true':
-      value = hard;
-      break;
 
     default:
       break;
@@ -78,26 +97,42 @@ class GamePage extends Component {
       showNext: true,
     });
     const fixedValue = 10;
-    let totalScore = 0;
     if (value === 'wrong' || value === false) {
-      totalScore = 0;
+      this.setState({
+        totalScore,
+      });
       return;
     }
-    totalScore = fixedValue + (timer * value);
+    console.log(value);
+    totalScore += (fixedValue + (timer * value));
+    console.log(totalScore);
     dispatch(updateScore(totalScore));
-  };
-
-  handleNext = () => {
-    const { questionNum } = this.state;
     this.setState({
-      questionNum: questionNum + 1,
+      totalScore,
     });
   };
 
+  handleNext = async () => {
+    const { questionNum, data } = this.state;
+    const { history } = this.props;
+    const questionLimit = 4;
+    this.setState({
+      questionNum: questionNum + 1,
+      timer: 30,
+      border: '',
+      borderRed: '',
+    });
+    this.handleTimer();
+    if (questionNum === questionLimit) {
+      history.push('/feedback');
+    }
+    this.updateAnswers(data);
+  };
+
   handleTimer = () => {
-    const { timer } = this.state;
     const intervalTimer = 1000;
-    let tim = timer;
+    const limit = 30;
+    let tim = limit;
     this.timerInterval = setInterval(() => {
       tim -= 1;
       this.setState({
