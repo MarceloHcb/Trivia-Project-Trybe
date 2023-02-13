@@ -1,4 +1,4 @@
-import { ADD_USER, UPDATE_SCORE, TOTAL_SCORE } from '../actions';
+import { ADD_USER, UPDATE_SCORE, TOTAL_SCORE, RESET_STATE } from '../actions';
 
 const INITIAL_STATE = {
   name: '',
@@ -24,6 +24,13 @@ const player = (state = INITIAL_STATE, action) => {
     return {
       ...state,
       assertions: state.assertions + action.assertions,
+    };
+  case RESET_STATE:
+    return {
+      name: '',
+      assertions: 0,
+      score: 0,
+      gravatarEmail: '',
     };
   default:
     return state;
