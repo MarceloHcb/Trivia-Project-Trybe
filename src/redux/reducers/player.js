@@ -1,4 +1,4 @@
-import { ADD_USER } from '../actions';
+import { ADD_USER, UPDATE_SCORE } from '../actions';
 
 const INITIAL_STATE = {
   name: '',
@@ -15,6 +15,12 @@ const player = (state = INITIAL_STATE, action) => {
       gravatarEmail: action.payload.gravatarEmail,
       name: action.payload.name,
     };
+  case UPDATE_SCORE:
+    return {
+      ...state,
+      score: action.payload,
+    };
+
   default:
     return state;
   }
