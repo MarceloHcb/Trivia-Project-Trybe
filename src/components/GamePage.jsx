@@ -6,21 +6,24 @@ class GamePage extends Component {
     results: [],
     isLoading: true,
     correct: [],
-    wrong: [],
+    // wrong: [],
     border: '',
     borderRed: '',
+    timer: 30,
+    isDisabled: false,
   };
 
   componentDidMount() {
     this.requestQuestions();
+    this.handleTimer();
   }
 
   requestQuestions = async () => {
+    const magicNumber = 0.5;
     const token = localStorage.getItem('token');
     const { history } = this.props;
     const response = await fetch(`https://opentdb.com/api.php?amount=5&token=${token}`);
     const data = await response.json();
-    console.log(data);
 
     if (data.response_code !== 0) {
       localStorage.removeItem('token');
@@ -30,25 +33,43 @@ class GamePage extends Component {
         results: data.results,
         isLoading: false,
         correct: data.results[0].correct_answer,
-        wrong: data.results[0].incorrect_answers.map((inc) => inc),
+        // wrong: data.results[0].incorrect_answers.map((inc) => inc),
+        answers: [...data.results[0].incorrect_answers.map((inc) => inc),
+          data.results[0].correct_answer].sort(() => Math.random() - magicNumber),
       });
     }
   };
 
-  handleClick = () => {
+  handleClick = (e) => {
+    e.preventDefault();
     this.setState({
       borderRed: '3px solid red',
       border: '3px solid rgb(6, 240, 15)',
     });
   };
 
+  handleTimer = () => {
+    const { timer } = this.state;
+    const intervalTimer = 1000;
+    let tim = timer;
+    const timerInterval = setInterval(() => {
+      tim -= 1;
+      this.setState({
+        timer: tim,
+      });
+      console.log(tim);
+      if (tim === 0) {
+        clearInterval(timerInterval);
+        this.setState({
+          isDisabled: true,
+        });
+      }
+    }, intervalTimer);
+  };
+
   render() {
-    const magicNumber = 0.5;
-    const { results, isLoading, correct, wrong, border, borderRed } = this.state;
-    const answers = [...wrong, correct].sort(() => Math.random() - magicNumber);
-    console.log(answers);
-    console.log(wrong);
-    console.log(correct);
+    const { results, isLoading, correct, border, borderRed,
+      answers, timer, isDisabled } = this.state;
     return (
       <div>
         {isLoading === true ? <p>Loading...</p> : (
@@ -59,6 +80,12 @@ class GamePage extends Component {
             <h2 data-testid="question-text">
               {results[0].question}
             </h2>
+            <h2>
+              {' '}
+              Timer:
+              {' '}
+              {timer}
+            </h2>
             <div data-testid="answer-options">
               { answers.map((answer, index) => (
                 answer === correct ? (
@@ -68,9 +95,9 @@ class GamePage extends Component {
                     value={ answer }
                     data-testid="correct-answer"
                     style={ { border } }
+                    disabled={ isDisabled }
                     onClick={ this.handleClick }
                   >
-                    {' '}
                     {answer}
                   </button>
                 )
@@ -82,7 +109,7 @@ class GamePage extends Component {
                       key={ index }
                       value={ answer }
                       style={ { border: borderRed } }
-                      className="green"
+                      disabled={ isDisabled }
                       onClick={ this.handleClick }
                     >
                       {answer}
