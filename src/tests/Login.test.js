@@ -4,7 +4,7 @@ import { renderWithRouterAndRedux } from './helpers/renderWithRouterAndRedux';
 import App from '../App';
 
 const mockToken = {
-    token: 'ab98a9va8e9a8f9ae'
+    response_code: 0
 }
 
 describe('Testes da tela de Login', () => {

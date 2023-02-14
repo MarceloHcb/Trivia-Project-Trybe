@@ -8,7 +8,6 @@ class GamePage extends Component {
     results: [],
     isLoading: true,
     correct: [],
-    // wrong: [],
     border: '',
     borderRed: '',
     timer: 30,
@@ -21,19 +20,15 @@ class GamePage extends Component {
   };
 
   componentDidMount() {
-    this.requestQuestions();
-    this.handleTimer();
+    this.requestQuestions(); this.handleTimer();
   }
 
   updateAnswers = (data) => {
-    const { questionNum } = this.state;
-    console.log(data);
-    const magicNumber = 0.5;
+    const { questionNum } = this.state; const magicNumber = 0.5;
     this.setState({
       results: data.results,
       isLoading: false,
       correct: data.results[questionNum + 1].correct_answer,
-      // wrong: data.results[0].incorrect_answers.map((inc) => inc),
       answers: [...data.results[questionNum + 1].incorrect_answers.map((inc) => inc),
         data.results[questionNum + 1].correct_answer]
         .sort(() => Math.random() - magicNumber),
@@ -41,16 +36,12 @@ class GamePage extends Component {
   };
 
   requestQuestions = async () => {
-    const { questionNum } = this.state;
-    const { history } = this.props;
-    const token = localStorage.getItem('token');
-    const response = await fetch(`https://opentdb.com/api.php?amount=5&token=${token}`);
+    const { questionNum } = this.state; const { history } = this.props;
+    const token = localStorage.getItem('token'); const response = await fetch(`https://opentdb.com/api.php?amount=5&token=${token}`);
     const data = await response.json();
     this.setState({
       data,
     });
-    console.log(data);
-
     if (data.response_code !== 0) {
       localStorage.removeItem('token');
       history.push('/');
@@ -60,7 +51,6 @@ class GamePage extends Component {
         results: data.results,
         isLoading: false,
         correct: data.results[questionNum].correct_answer,
-        // wrong: data.results[0].incorrect_answers.map((inc) => inc),
         answers: [...data.results[questionNum].incorrect_answers.map((inc) => inc),
           data.results[questionNum].correct_answer]
           .sort(() => Math.random() - magicNumber),
@@ -69,13 +59,9 @@ class GamePage extends Component {
   };
 
   handleClick = ({ target }) => {
-    let { value } = target;
-    const { dispatch } = this.props;
-    const { timer } = this.state;
+    let { value } = target; const { dispatch } = this.props; const { timer } = this.state;
     let { totalScore, assertions } = this.state;
-    const medium = 2;
-    const hard = 3;
-    const easy = 1;
+    const medium = 2; const hard = 3; const easy = 1;
     clearInterval(this.timerInterval);
     switch (value) {
     case 'easy':
@@ -103,14 +89,11 @@ class GamePage extends Component {
       return;
     }
     totalScore += (fixedValue + (timer * value));
-    console.log(totalScore);
-
     if (target.id === 'correct') {
       this.setState({
         assertions: assertions += 1,
       });
     }
-    console.log(assertions);
     const dispatchObj = {
       totalScore,
       assertions,
@@ -119,6 +102,25 @@ class GamePage extends Component {
     this.setState({
       totalScore,
     });
+  };
+
+  saveRanking = () => {
+    const { token } = this.state;
+    const { name, score, assertions, gravatarEmail } = this.props;
+    const users = JSON.parse(localStorage.getItem('users'));
+    const gravatar = {
+      name,
+      score,
+      assertions,
+      gravatarEmail,
+      token,
+    };
+    if (users) {
+      users.push(gravatar);
+      localStorage.setItem('users', JSON.stringify(users));
+    } else {
+      localStorage.setItem('users', JSON.stringify([gravatar]));
+    }
   };
 
   handleNext = async () => {
@@ -133,6 +135,7 @@ class GamePage extends Component {
     });
     this.handleTimer();
     if (questionNum === questionLimit) {
+      this.saveRanking();
       history.push('/feedback');
       return;
     }
@@ -171,9 +174,7 @@ class GamePage extends Component {
               {results[questionNum].question}
             </h2>
             <h2>
-              {' '}
               Timer:
-              {' '}
               {timer}
             </h2>
             <div data-testid="answer-options">
@@ -193,7 +194,6 @@ class GamePage extends Component {
                   </button>
                 )
                   : (
-
                     <button
                       data-testid={ `wrong-answer-${index}` }
                       type="button"
@@ -204,7 +204,6 @@ class GamePage extends Component {
                       onClick={ this.handleClick }
                     >
                       {answer}
-
                     </button>
                   )
               ))}
@@ -216,7 +215,6 @@ class GamePage extends Component {
                     onClick={ this.handleNext }
                   >
                     next
-
                   </button>
                 )}
               </div>
@@ -227,12 +225,22 @@ class GamePage extends Component {
     );
   }
 }
-
-GamePage.propTypes = {
-  dispatch: PropTypes.func.isRequired,
-  history: PropTypes.shape({
-    push: PropTypes.func.isRequired,
-  }).isRequired,
+GamePage.defaultProps = {
+  history: {},
 };
-
-export default connect()(GamePage);
+GamePage.propTypes = {
+  name: PropTypes.string,
+  score: PropTypes.number,
+  totalScore: PropTypes.number,
+  userImage: PropTypes.string,
+  dispatch: PropTypes.func,
+  history: PropTypes.shape({
+    push: PropTypes.func,
+  }),
+}.isRequired;
+const mapStateToProps = (state) => ({
+  name: state.player.name,
+  score: state.player.score,
+  gravatarEmail: state.player.userEmail,
+});
+export default connect(mapStateToProps)(GamePage);
