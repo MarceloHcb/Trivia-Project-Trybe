@@ -6,10 +6,15 @@ import Header from '../components/Header';
 class Feedback extends Component {
   render() {
     const correctAnwers = 3;
-    const { assertions, score, history } = this.props;
+    const { assertions, score, name, userImage, history } = this.props;
     return (
       <div data-testid="feedback-text">
         <Header />
+        <section>
+          <img src={ userImage } alt="Avatar" data-testid="header-profile-picture" />
+          <h4 data-testid="header-player-name">{ name }</h4>
+          <p data-testid="header-score">{ score }</p>
+        </section>
         {
           assertions >= correctAnwers ? <h2 data-testid="feedback-text">Well Done!</h2>
             : <h2 data-testid="feedback-text">Could be better...</h2>
@@ -40,11 +45,14 @@ class Feedback extends Component {
 const mapStateToProps = (state) => ({
   assertions: state.player.assertions,
   score: state.player.score,
+  userImage: state.player.userImage,
 });
 
 Feedback.propTypes = {
   assertions: PropTypes.number.isRequired,
+  name: PropTypes.string.isRequired,
   score: PropTypes.number.isRequired,
+  userImage: PropTypes.string.isRequired,
   history: PropTypes.shape({
     push: PropTypes.func,
   }).isRequired,
