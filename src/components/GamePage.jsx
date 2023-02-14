@@ -17,6 +17,7 @@ class GamePage extends Component {
     showNext: false,
     totalScore: 0,
     data: [],
+    assertions: 0,
   };
 
   componentDidMount() {
@@ -71,7 +72,7 @@ class GamePage extends Component {
     let { value } = target;
     const { dispatch } = this.props;
     const { timer } = this.state;
-    let { totalScore } = this.state;
+    let { totalScore, assertions } = this.state;
     const medium = 2;
     const hard = 3;
     const easy = 1;
@@ -86,7 +87,6 @@ class GamePage extends Component {
     case 'hard':
       value = hard;
       break;
-
     default:
       break;
     }
@@ -102,10 +102,20 @@ class GamePage extends Component {
       });
       return;
     }
-    console.log(value);
     totalScore += (fixedValue + (timer * value));
     console.log(totalScore);
-    dispatch(updateScore(totalScore));
+
+    if (target.id === 'correct') {
+      this.setState({
+        assertions: assertions += 1,
+      });
+    }
+    console.log(assertions);
+    const dispatchObj = {
+      totalScore,
+      assertions,
+    };
+    dispatch(updateScore(dispatchObj));
     this.setState({
       totalScore,
     });
@@ -174,6 +184,7 @@ class GamePage extends Component {
                     type="button"
                     value={ results[questionNum].difficulty }
                     data-testid="correct-answer"
+                    id="correct"
                     style={ { border } }
                     disabled={ isDisabled }
                     onClick={ this.handleClick }

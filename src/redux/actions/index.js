@@ -14,8 +14,3 @@ export const updateScore = (payload) => ({
   type: UPDATE_SCORE,
   payload,
 });
-
-export const totalScore = (payload) => ({
-  type: TOTAL_SCORE,
-  payload,
-});
