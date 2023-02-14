@@ -70,9 +70,8 @@ class GamePage extends Component {
   handleClick = ({ target }) => {
     let { value } = target;
     const { dispatch } = this.props;
-    const { timer, data } = this.state;
+    const { timer } = this.state;
     let { totalScore } = this.state;
-    console.log(data);
     const medium = 2;
     const hard = 3;
     const easy = 1;
@@ -125,6 +124,7 @@ class GamePage extends Component {
     this.handleTimer();
     if (questionNum === questionLimit) {
       history.push('/feedback');
+      return;
     }
     this.updateAnswers(data);
   };
@@ -170,7 +170,7 @@ class GamePage extends Component {
               { answers.map((answer, index) => (
                 answer === correct ? (
                   <button
-                    key="8"
+                    key={ index }
                     type="button"
                     value={ results[questionNum].difficulty }
                     data-testid="correct-answer"
