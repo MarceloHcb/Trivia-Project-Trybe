@@ -1,4 +1,4 @@
-import { ADD_USER, UPDATE_SCORE, TOTAL_SCORE, RESET_STATE } from '../actions';
+import { ADD_USER, UPDATE_SCORE, RESET_STATE } from '../actions';
 
 const INITIAL_STATE = {
   name: '',
