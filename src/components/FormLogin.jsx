@@ -30,6 +30,7 @@ class FormLogin extends Component {
     localStorage.setItem('token', token.token);
     dispatch(addUser(email, name));
     history.push('/gamepage');
+    console.log(token);
   };
 
   handleSettings = () => {
