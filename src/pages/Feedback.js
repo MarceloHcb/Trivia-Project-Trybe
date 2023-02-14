@@ -11,7 +11,8 @@ class Feedback extends Component {
       <div data-testid="feedback-text">
         <Header />
         {
-          assertions >= correctAnwers ? 'Well Done!' : 'Could be better...'
+          assertions >= correctAnwers ? <h2 data-testid="feedback-text">Well Done!</h2>
+            : <h2 data-testid="feedback-text">Could be better...</h2>
         }
         <div data-testid="feedback-total-score">
           { score }

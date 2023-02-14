@@ -18,12 +18,8 @@ const player = (state = INITIAL_STATE, action) => {
   case UPDATE_SCORE:
     return {
       ...state,
-      score: action.payload,
-    };
-  case TOTAL_SCORE:
-    return {
-      ...state,
-      assertions: state.assertions + action.assertions,
+      score: action.payload.totalScore,
+      assertions: action.payload.assertions,
     };
   case RESET_STATE:
     return {

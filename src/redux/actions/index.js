@@ -24,3 +24,4 @@ export const totalScore = (payload) => ({
 export const resetState = () => ({
   type: RESET_STATE,
 });
+
