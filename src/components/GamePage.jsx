@@ -20,14 +20,11 @@ class GamePage extends Component {
   };
 
   componentDidMount() {
-    this.requestQuestions();
-    this.handleTimer();
+    this.requestQuestions(); this.handleTimer();
   }
 
   updateAnswers = (data) => {
-    const { questionNum } = this.state;
-    console.log(data);
-    const magicNumber = 0.5;
+    const { questionNum } = this.state; const magicNumber = 0.5;
     this.setState({
       results: data.results,
       isLoading: false,
@@ -39,10 +36,8 @@ class GamePage extends Component {
   };
 
   requestQuestions = async () => {
-    const { questionNum } = this.state;
-    const { history } = this.props;
-    const token = localStorage.getItem('token');
-    const response = await fetch(`https://opentdb.com/api.php?amount=5&token=${token}`);
+    const { questionNum } = this.state; const { history } = this.props;
+    const token = localStorage.getItem('token'); const response = await fetch(`https://opentdb.com/api.php?amount=5&token=${token}`);
     const data = await response.json();
     this.setState({
       data,
@@ -64,13 +59,9 @@ class GamePage extends Component {
   };
 
   handleClick = ({ target }) => {
-    let { value } = target;
-    const { dispatch } = this.props;
-    const { timer } = this.state;
+    let { value } = target; const { dispatch } = this.props; const { timer } = this.state;
     let { totalScore, assertions } = this.state;
-    const medium = 2;
-    const hard = 3;
-    const easy = 1;
+    const medium = 2; const hard = 3; const easy = 1;
     clearInterval(this.timerInterval);
     switch (value) {
     case 'easy':
@@ -115,13 +106,13 @@ class GamePage extends Component {
 
   saveRanking = () => {
     const { token } = this.state;
-    const { name, userImage, userEmail, score } = this.props;
+    const { name, score, assertions, gravatarEmail } = this.props;
     const users = JSON.parse(localStorage.getItem('users'));
     const gravatar = {
       name,
       score,
-      userImage,
-      userEmail,
+      assertions,
+      gravatarEmail,
       token,
     };
     if (users) {
@@ -183,9 +174,7 @@ class GamePage extends Component {
               {results[questionNum].question}
             </h2>
             <h2>
-              {' '}
               Timer:
-              {' '}
               {timer}
             </h2>
             <div data-testid="answer-options">
@@ -244,7 +233,6 @@ GamePage.propTypes = {
   score: PropTypes.number,
   totalScore: PropTypes.number,
   userImage: PropTypes.string,
-  userEmail: PropTypes.string,
   dispatch: PropTypes.func,
   history: PropTypes.shape({
     push: PropTypes.func,
@@ -253,8 +241,6 @@ GamePage.propTypes = {
 const mapStateToProps = (state) => ({
   name: state.player.name,
   score: state.player.score,
-  totalScore: state.player.score,
-  userImage: state.player.userImage,
-  userEmail: state.player.userEmail,
+  gravatarEmail: state.player.userEmail,
 });
 export default connect(mapStateToProps)(GamePage);
