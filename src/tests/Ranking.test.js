@@ -1,15 +1,55 @@
-import App from '../App';
-import Ranking from '../pages/Ranking';
-import renderWithRouterAndRedux from './helpers/renderWithRouterAndRedux';
-import {  screen } from '@testing-library/react';
+import React from 'react';
+import { screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+import renderWithRouterAndRedux from './helpers/renderWithRouterAndRedux';
+import App from '../App';
 
-describe('Testa página Ranking', () => {
-  
-  it('Será validado se exibir o título Ranking', () => {
-    renderWithRouterAndRedux(<Ranking />);
-    
-    const title = screen.getByRole('heading', {level: 1, name: /Ranking/i} )
+const INITIAL_STATE = {
+  player: {
+    name: '',
+    assertions: 0,
+    score: 0,
+    gravatarEmail: '',
+  }  
+};
+
+const player = [
+  {
+    "name": "teste2",
+    "score": 0
+},
+  {
+      "name": "leo",
+      "score": 80
+  },
+  {
+    "name": "teste",
+    "score": 100
+  }
+]
+
+describe('Ranking', () => {
+
+  it('deve exibir o ranking dos usuários', () => {
+    localStorage.setItem('users', JSON.stringify(player))
+    const { history } = renderWithRouterAndRedux(<App />, INITIAL_STATE, '/ranking')
+
+    const title = screen.getByTestId('ranking-title');
     expect(title).toBeInTheDocument();
-    })
-})
+
+    const Button = screen.getByTestId('btn-go-home');
+    expect(Button).toBeInTheDocument();
+    const name = screen.getByText('leo')
+    expect(name).toBeInTheDocument();
+    const name2 = screen.getByText('teste')
+    expect(name2).toBeInTheDocument();
+    const name3 = screen.getByText('teste2')
+    expect(name3).toBeInTheDocument();
+    
+    userEvent.click(Button);
+    const { pathname } = history.location;
+    expect(pathname).toBe('/');
+
+
+  });
+});
