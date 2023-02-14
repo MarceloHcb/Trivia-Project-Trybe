@@ -3,6 +3,23 @@ import { screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import renderWithRouterAndRedux from './helpers/renderWithRouterAndRedux';
 import Feedback from '../pages/Feedback';
+import App from '../App';
+
+const INITIAL_STATE = {
+  player: {
+    name: '',
+    assertions: 0,
+    score: 0,
+    gravatarEmail: '',
+  }  
+};
+
+const player = [
+  {
+      "name": "leo",
+      "score": 100
+  }
+]
 
 describe('Testa página Feedback', () => {
 
@@ -37,7 +54,8 @@ describe('Testa página Feedback', () => {
   });
 
   it('Testa botão "Play Again"', async () => {
-    const { history } = renderWithRouterAndRedux(<Feedback />);
+    localStorage.setItem('users', JSON.stringify(player))
+    const { history } = renderWithRouterAndRedux(<App />, INITIAL_STATE, '/feedback')
     const aboutLink = screen.getByRole('button', { name: 'Play Again' });
     expect(aboutLink).toBeInTheDocument();
     userEvent.click(aboutLink);
@@ -46,7 +64,8 @@ describe('Testa página Feedback', () => {
   });
 
   it('Testa botão "Ranking"', async () => {
-    const { history } = renderWithRouterAndRedux(<Feedback />);
+    localStorage.setItem('users', JSON.stringify(player))
+    const { history } = renderWithRouterAndRedux(<App />, INITIAL_STATE, '/feedback')
     const btnRanking = screen.getByRole('button', { name: 'Ranking' });
     expect(btnRanking).toBeInTheDocument();
     userEvent.click(btnRanking);
